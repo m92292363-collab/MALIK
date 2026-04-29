@@ -986,11 +986,6 @@
                 <span class="sub">Islamic Institute</span>
             </div>
         </div>
-        <div class="nav-right">
-            <button class="admin-trigger" onclick="openAdminModal()" title="Admin login">
-                <i class="fas fa-lock"></i> Admin
-            </button>
-        </div>
     </nav>
 
     <!-- SEARCH -->
@@ -2063,6 +2058,15 @@ async function resetPassword() {
         }
     };
 })();
+// Hidden admin access via secret URL hash
+function checkAdminHash() {
+    if (window.location.hash === '#imammalick-admin') {
+        openAdminModal();
+        history.replaceState(null, '', window.location.pathname);
+    }
+}
+window.addEventListener('hashchange', checkAdminHash);
+window.addEventListener('load', checkAdminHash);
 </script>
 </body>
 </html>
