@@ -1623,7 +1623,7 @@ async function handlePhotoUpload(event) {
                 var res = await fetch('/api/upload-photo', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ studentId: currentStudentData.studentId, photoDataUrl: dataUrl })
+                    body: JSON.stringify({ studentId: currentStudentData.studentId || currentStudentData.student_id, photoDataUrl: dataUrl })
                 });
                 var data = await res.json();
                 showPhotoToast(data.success ? '✓ Photo saved successfully' : '⚠ Save failed', false);
