@@ -1,0 +1,14 @@
+{
+  "name": "imam-malick-islamic-institute",
+  "version": "1.0.0",
+  "description": "Imam Malick Islamic Institute Student Portal",
+  "scripts": {
+    "dev": "netlify dev"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}
