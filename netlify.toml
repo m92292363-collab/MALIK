@@ -1,0 +1,17 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+  command = "echo 'No build step needed'"
+
+[dev]
+  port = 8888
+  targetPort = 3000
+
+# Rewrite /api/* calls to Netlify Functions
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[functions]
+  node_bundler = "esbuild"
