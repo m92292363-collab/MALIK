@@ -21,7 +21,7 @@ export async function handler(event) {
     }
 
     // Rough size guard: base64 of 500 KB original ≈ 680 KB string
-    if (photoDataUrl.length > 700_000) {
+   if (photoDataUrl.length > 500_000) {
       return json({ error: 'Image is too large. Please use a smaller photo.' }, 400);
     }
 
