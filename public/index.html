@@ -705,7 +705,8 @@
     </div>
     <div class="dashboard-body">
         <div class="admin-tabs">
-            <button class="admin-tab active" onclick="switchAdminTab('add-marks', this)"><i class="fas fa-edit"></i> Enter Results</button>
+            <button class="admin-tab active" onclick="switchAdminTab('stats', this)"><i class="fas fa-chart-bar"></i> Statistics</button>
+<button class="admin-tab" onclick="switchAdminTab('add-marks', this)"><i class="fas fa-edit"></i> Enter Results</button>
             <button class="admin-tab" onclick="switchAdminTab('add-student', this)"><i class="fas fa-user-plus"></i> Add Student</button>
             <button class="admin-tab" onclick="switchAdminTab('all-students', this)"><i class="fas fa-users"></i> All Students</button>
             <button class="admin-tab" onclick="switchAdminTab('update-student', this)"><i class="fas fa-user-edit"></i> Edit Student</button>
@@ -713,10 +714,52 @@
             <button class="admin-tab" onclick="switchAdminTab('all-results', this)"><i class="fas fa-table"></i> All Results</button>
             <button class="admin-tab" onclick="switchAdminTab('delete-results', this)"><i class="fas fa-trash-alt"></i> Del. Results</button>
             <button class="admin-tab" onclick="switchAdminTab('reset-password', this)"><i class="fas fa-key"></i> Reset PW</button>
+<button class="admin-tab" onclick="switchAdminTab('bulk-marks', this)"><i class="fas fa-layer-group"></i> Bulk Results</button>
+<button class="admin-tab" onclick="switchAdminTab('top-students', this)"><i class="fas fa-trophy"></i> Top Students</button>
+<button class="admin-tab" onclick="switchAdminTab('export', this)"><i class="fas fa-download"></i> Export</button>
+<button class="admin-tab" onclick="switchAdminTab('promote', this)"><i class="fas fa-arrow-up"></i> Promote</button>
         </div>
 
         <!-- Panel: Add Marks -->
-        <div class="admin-panel active" id="panel-add-marks">
+        <div class="admin-panel active" id="panel-stats">
+    <div class="admin-form-card">
+        <h3><i class="fas fa-chart-bar"></i> Statistics Dashboard</h3>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;" id="statsCards">
+            <div style="background:linear-gradient(135deg,#1565c0,#1e88e5);border-radius:1rem;padding:1.5rem;text-align:center;color:white;">
+                <div style="font-size:2rem;font-weight:800;" id="statTotalStudents">--</div>
+                <div style="font-size:0.85rem;opacity:0.85;margin-top:0.3rem;">Total Students</div>
+                <i class="fas fa-users" style="font-size:1.5rem;margin-top:0.5rem;opacity:0.6;"></i>
+            </div>
+            <div style="background:linear-gradient(135deg,#e53935,#ef5350);border-radius:1rem;padding:1.5rem;text-align:center;color:white;">
+                <div style="font-size:2rem;font-weight:800;" id="statTotalResults">--</div>
+                <div style="font-size:0.85rem;opacity:0.85;margin-top:0.3rem;">Total Results</div>
+                <i class="fas fa-clipboard-list" style="font-size:1.5rem;margin-top:0.5rem;opacity:0.6;"></i>
+            </div>
+            <div style="background:linear-gradient(135deg,#2e7d32,#43a047);border-radius:1rem;padding:1.5rem;text-align:center;color:white;">
+                <div style="font-size:2rem;font-weight:800;" id="statTotalClasses">--</div>
+                <div style="font-size:0.85rem;opacity:0.85;margin-top:0.3rem;">Total Classes</div>
+                <i class="fas fa-chalkboard" style="font-size:1.5rem;margin-top:0.5rem;opacity:0.6;"></i>
+            </div>
+            <div style="background:linear-gradient(135deg,#f57f17,#ffa000);border-radius:1rem;padding:1.5rem;text-align:center;color:white;">
+                <div style="font-size:2rem;font-weight:800;" id="statAvgScore">--</div>
+                <div style="font-size:0.85rem;opacity:0.85;margin-top:0.3rem;">Avg Score</div>
+                <i class="fas fa-star" style="font-size:1.5rem;margin-top:0.5rem;opacity:0.6;"></i>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div style="background:#f8f9fa;border-radius:1rem;padding:1.2rem;border:1px solid #e3f2fd;">
+                <h4 style="color:var(--islamic-blue);margin-bottom:1rem;font-size:0.95rem;"><i class="fas fa-users" style="color:var(--accent-gold);"></i> Students by Class</h4>
+                <div id="statsByClass">--</div>
+            </div>
+            <div style="background:#f8f9fa;border-radius:1rem;padding:1.2rem;border:1px solid #e3f2fd;">
+                <h4 style="color:var(--islamic-blue);margin-bottom:1rem;font-size:0.95rem;"><i class="fas fa-chart-line" style="color:var(--accent-gold);"></i> Avg Score by Grade</h4>
+                <div id="statsByGrade">--</div>
+            </div>
+        </div>
+        <button class="btn-submit" onclick="loadStats()" style="margin-top:0;"><i class="fas fa-sync-alt"></i> Refresh Stats</button>
+    </div>
+</div>
+<div class="admin-panel" id="panel-add-marks">
             <div class="admin-form-card">
                 <h3><i class="fas fa-edit"></i> Enter Student Results</h3>
                 <div class="form-grid">
@@ -953,7 +996,167 @@
                 <div class="error-msg" id="del-res-error"></div>
             </div>
         </div>
+<!-- Panel: Bulk Results -->
+<div class="admin-panel" id="panel-bulk-marks">
+    <div class="admin-form-card">
+        <h3><i class="fas fa-layer-group"></i> Bulk Result Entry</h3>
+        <div class="form-grid">
+            <div class="form-group"><label>Grade Level *</label>
+                <select id="bulk-grade" onchange="loadBulkStudents()">
+                    <option value="">-- Select Grade --</option>
+                    <option value="10">Grade 10</option>
+                    <option value="11">Grade 11</option>
+                    <option value="12">Grade 12</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Class *</label>
+                <select id="bulk-class" onchange="loadBulkStudents()">
+                    <option value="">-- Select Class --</option>
+                    <option value="A">Class A</option>
+                    <option value="B">Class B</option>
+                    <option value="C">Class C</option>
+                    <option value="D">Class D</option>
+                    <option value="E">Class E</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Subject *</label>
+                <select id="bulk-subject">
+                    <option value="">-- Select Subject --</option>
+                    <option value="Quran">Quran</option>
+                    <option value="Tajweed">Tajweed</option>
+                    <option value="Tafseer">Tafseer</option>
+                    <option value="Hadith">Hadith</option>
+                    <option value="Tawheed">Tawheed</option>
+                    <option value="Fiqh">Fiqh</option>
+                    <option value="Faraid">Faraid</option>
+                    <option value="Nahw">Nahw (Arabic Grammar)</option>
+                    <option value="Balagha">Balagha</option>
+                    <option value="Adab">Adab (Literature)</option>
+                    <option value="Mutala'a">Mutala'a</option>
+                    <option value="Insha">Insha (Composition)</option>
+                    <option value="History">Islamic History</option>
+                    <option value="Psychology">Psychology</option>
+                    <option value="Geography">Geography</option>
+                    <option value="English Language">English Language</option>
+                    <option value="Science">Science</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Grade *</label>
+                <select id="bulk-grade-letter">
+                    <option value="">-- Select Grade --</option>
+                    <option value="A">A - Excellent</option>
+                    <option value="B">B - Very Good</option>
+                    <option value="C">C - Good</option>
+                    <option value="D">D - Pass</option>
+                    <option value="F">F - Fail</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Academic Year *</label><input type="text" id="bulk-year" value="2025-2026"></div>
+            <div class="form-group"><label>Term *</label>
+                <select id="bulk-term">
+                    <option value="Term 1">Term 1</option>
+                    <option value="Term 2">Term 2</option>
+                    <option value="Term 3">Term 3</option>
+                </select>
+            </div>
+        </div>
+        <div id="bulk-students-table" style="margin-top:1.5rem;"></div>
+        <button class="btn-submit" id="saveBulkBtn" onclick="saveBulkMarks()" style="display:none;"><i class="fas fa-save"></i> Save All Results</button>
+        <div class="success-msg" id="bulk-success"></div>
+        <div class="error-msg" id="bulk-error"></div>
+    </div>
+</div>
 
+<!-- Panel: Top Students -->
+<div class="admin-panel" id="panel-top-students">
+    <div class="admin-form-card">
+        <h3><i class="fas fa-trophy"></i> Top Students</h3>
+        <div class="form-grid">
+            <div class="form-group"><label>Academic Year</label><input type="text" id="top-year" value="2025-2026"></div>
+            <div class="form-group"><label>Term</label>
+                <select id="top-term">
+                    <option value="Term 1">Term 1</option>
+                    <option value="Term 2">Term 2</option>
+                    <option value="Term 3">Term 3</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Grade (optional)</label>
+                <select id="top-grade">
+                    <option value="">-- All Grades --</option>
+                    <option value="10">Grade 10</option>
+                    <option value="11">Grade 11</option>
+                    <option value="12">Grade 12</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Show Top</label>
+                <select id="top-limit">
+                    <option value="10">Top 10</option>
+                    <option value="20">Top 20</option>
+                    <option value="50">Top 50</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-submit" onclick="loadTopStudents()" style="margin-top:0.5rem;"><i class="fas fa-search"></i> Find Top Students</button>
+        <div class="table-wrap" style="margin-top:1rem;">
+            <table class="admin-data-table" id="topStudentsTable">
+                <thead><tr><th>Rank</th><th>Student ID</th><th>Name</th><th>Grade</th><th>Class</th><th>Total</th><th>Average</th></tr></thead>
+                <tbody id="topStudentsBody"><tr><td colspan="7" style="text-align:center;padding:2rem;color:#999;">Click "Find Top Students" to load</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Panel: Export -->
+<div class="admin-panel" id="panel-export">
+    <div class="admin-form-card">
+        <h3><i class="fas fa-download"></i> Export Data</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div style="background:#e3f2fd;border-radius:1rem;padding:1.5rem;text-align:center;border:1px solid #90caf9;">
+                <i class="fas fa-users" style="font-size:2.5rem;color:var(--islamic-blue);margin-bottom:1rem;display:block;"></i>
+                <h4 style="color:var(--islamic-blue);margin-bottom:0.5rem;">Export Students</h4>
+                <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:1rem;">Download all student data as CSV</p>
+                <button class="btn-submit" onclick="exportStudentsCSV()" style="margin:0 auto;"><i class="fas fa-file-csv"></i> Download CSV</button>
+            </div>
+            <div style="background:#e3f2fd;border-radius:1rem;padding:1.5rem;text-align:center;border:1px solid #90caf9;">
+                <i class="fas fa-clipboard-list" style="font-size:2.5rem;color:var(--islamic-blue);margin-bottom:1rem;display:block;"></i>
+                <h4 style="color:var(--islamic-blue);margin-bottom:0.5rem;">Export Results</h4>
+                <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:1rem;">Download all results as CSV</p>
+                <button class="btn-submit" onclick="exportResultsCSV()" style="margin:0 auto;"><i class="fas fa-file-csv"></i> Download CSV</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Panel: Promote Students -->
+<div class="admin-panel" id="panel-promote">
+    <div class="admin-form-card">
+        <h3><i class="fas fa-arrow-up"></i> Promote Students</h3>
+        <p style="color:#856404;background:#fff8e1;padding:1rem;border-radius:10px;margin-bottom:1.5rem;font-size:0.9rem;border:1px solid #ffc107;"><i class="fas fa-info-circle"></i> This will move all students in a class up to the next grade level.</p>
+        <div class="form-grid">
+            <div class="form-group"><label>From Grade *</label>
+                <select id="promote-from">
+                    <option value="10">Grade 10 → Grade 11</option>
+                    <option value="11">Grade 11 → Grade 12</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Class *</label>
+                <select id="promote-class">
+                    <option value="">-- All Classes --</option>
+                    <option value="A">Class A</option>
+                    <option value="B">Class B</option>
+                    <option value="C">Class C</option>
+                    <option value="D">Class D</option>
+                    <option value="E">Class E</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-submit" onclick="previewPromote()" style="margin-top:0.5rem;"><i class="fas fa-eye"></i> Preview</button>
+        <div id="promote-preview" style="margin-top:1rem;"></div>
+        <button class="btn-danger" id="confirmPromoteBtn" onclick="confirmPromote()" style="display:none;margin-top:1rem;"><i class="fas fa-arrow-up"></i> Confirm Promote</button>
+        <div class="success-msg" id="promote-success"></div>
+        <div class="error-msg" id="promote-error"></div>
+    </div>
+</div>
         <!-- Panel: Reset Password -->
         <div class="admin-panel" id="panel-reset-password">
             <div class="admin-form-card">
@@ -1820,8 +2023,223 @@ function switchAdminTab(tab, btn) {
     if (btn) btn.classList.add('active');
     var panel = document.getElementById('panel-'+tab);
     if (panel) panel.classList.add('active');
+    if (tab === 'stats') loadStats();
 }
 
+async function loadStats() {
+    document.getElementById('statTotalStudents').textContent = '...';
+    document.getElementById('statTotalResults').textContent = '...';
+    document.getElementById('statTotalClasses').textContent = '...';
+    document.getElementById('statAvgScore').textContent = '...';
+    try {
+        const [studRes, resRes] = await Promise.all([
+            fetch('/api/get-all-students'),
+            fetch('/api/get-all-results')
+        ]);
+        const studData = await studRes.json();
+        const resData = await resRes.json();
+        const students = studData.success ? studData.students : [];
+        const results = resData.success ? resData.results : [];
+        document.getElementById('statTotalStudents').textContent = students.length;
+        document.getElementById('statTotalResults').textContent = results.length;
+        const classes = new Set(students.map(s => (s.grade_level + '-' + s.class_name)));
+        document.getElementById('statTotalClasses').textContent = classes.size;
+        const avg = results.length ? (results.reduce((s,r) => s + Number(r.score||0), 0) / results.length).toFixed(1) : '--';
+        document.getElementById('statAvgScore').textContent = avg;
+        const byClass = {};
+        students.forEach(s => {
+            const key = 'Grade ' + s.grade_level + ' - Class ' + (s.class_name||'?');
+            byClass[key] = (byClass[key]||0) + 1;
+        });
+        document.getElementById('statsByClass').innerHTML = Object.entries(byClass).sort().map(([k,v]) =>
+            `<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid #e3f2fd;font-size:0.88rem;">
+                <span style="color:var(--text-dark);">${k}</span>
+                <span style="font-weight:700;color:var(--islamic-blue);">${v} students</span>
+            </div>`
+        ).join('');
+        const byGrade = {};
+        results.forEach(r => {
+            if (!byGrade[r.grade_level]) byGrade[r.grade_level] = {sum:0,count:0};
+            byGrade[r.grade_level].sum += Number(r.score||0);
+            byGrade[r.grade_level].count++;
+        });
+        document.getElementById('statsByGrade').innerHTML = Object.entries(byGrade).sort().map(([g,v]) => {
+            const avg = (v.sum/v.count).toFixed(1);
+            const pct = Math.min(100, (avg/100)*100);
+            const color = avg>=75?'#2e7d32':avg>=50?'#f57f17':'#c0392b';
+            return `<div style="margin-bottom:0.8rem;">
+                <div style="display:flex;justify-content:space-between;font-size:0.88rem;margin-bottom:0.3rem;">
+                    <span>Grade ${g}</span><span style="font-weight:700;color:${color};">${avg}</span>
+                </div>
+                <div style="background:#e0e0e0;border-radius:10px;height:8px;">
+                    <div style="background:${color};width:${pct}%;height:8px;border-radius:10px;transition:width 0.5s;"></div>
+                </div>
+            </div>`;
+        }).join('');
+    } catch(err) {
+        document.getElementById('statTotalStudents').textContent = '!';
+    }
+}
+async function loadBulkStudents() {
+    const grade = document.getElementById('bulk-grade').value;
+    const cls = document.getElementById('bulk-class').value;
+    const container = document.getElementById('bulk-students-table');
+    const saveBtn = document.getElementById('saveBulkBtn');
+    if (!grade || !cls) { container.innerHTML = ''; saveBtn.style.display = 'none'; return; }
+    container.innerHTML = '<p style="text-align:center;padding:1rem;"><i class="fas fa-spinner fa-spin"></i> Loading students...</p>';
+    try {
+        const res = await fetch('/api/get-all-students');
+        const data = await res.json();
+        const students = data.success ? data.students.filter(s => String(s.grade_level) === grade && s.class_name === cls) : [];
+        if (!students.length) { container.innerHTML = '<p style="color:#999;text-align:center;padding:1rem;">No students found in this class.</p>'; saveBtn.style.display = 'none'; return; }
+        container.innerHTML = `<div class="table-wrap"><table class="admin-data-table">
+            <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Score (0-100)</th></tr></thead>
+            <tbody>${students.map((s,i) => `<tr><td>${i+1}</td><td style="font-weight:700;color:#1565c0;">${s.student_id}</td><td>${s.full_name}</td><td><input type="number" min="0" max="100" placeholder="Score" style="width:90px;padding:0.4rem;border:1.5px solid #90caf9;border-radius:8px;font-size:14px;" id="bulk-score-${s.student_id}"></td></tr>`).join('')}
+            </tbody></table></div>`;
+        saveBtn.style.display = 'flex';
+    } catch(err) { container.innerHTML = '<p style="color:#c0392b;text-align:center;">Connection error</p>'; }
+}
+
+async function saveBulkMarks() {
+    const grade = document.getElementById('bulk-grade').value;
+    const cls = document.getElementById('bulk-class').value;
+    const subject = document.getElementById('bulk-subject').value;
+    const gradeLetter = document.getElementById('bulk-grade-letter').value;
+    const year = document.getElementById('bulk-year').value.trim();
+    const term = document.getElementById('bulk-term').value;
+    const sEl = document.getElementById('bulk-success');
+    const eEl = document.getElementById('bulk-error');
+    sEl.classList.remove('show'); eEl.classList.remove('show');
+    if (!subject || !gradeLetter || !year || !term) { eEl.textContent = 'Please fill all fields'; eEl.classList.add('show'); return; }
+    const inputs = document.querySelectorAll('[id^="bulk-score-"]');
+    const entries = [];
+    inputs.forEach(input => {
+        const studentId = input.id.replace('bulk-score-', '');
+        const score = parseInt(input.value);
+        if (!isNaN(score) && score >= 0 && score <= 100) entries.push({ studentId, score });
+    });
+    if (!entries.length) { eEl.textContent = 'Please enter at least one score'; eEl.classList.add('show'); return; }
+    const btn = document.getElementById('saveBulkBtn');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    let saved = 0, failed = 0;
+    for (const entry of entries) {
+        try {
+            const res = await fetch('/api/add-marks', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ studentId: entry.studentId, subject, score: entry.score, grade: gradeLetter, academicYear: year, term }) });
+            const data = await res.json();
+            if (data.success) saved++; else failed++;
+        } catch { failed++; }
+    }
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save All Results';
+    sEl.textContent = `✅ Saved ${saved} results successfully!${failed ? ' ⚠ ' + failed + ' failed.' : ''}`;
+    sEl.classList.add('show');
+}
+
+async function loadTopStudents() {
+    const year = document.getElementById('top-year').value.trim();
+    const term = document.getElementById('top-term').value;
+    const grade = document.getElementById('top-grade').value;
+    const limit = parseInt(document.getElementById('top-limit').value);
+    const tbody = document.getElementById('topStudentsBody');
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;"><i class="fas fa-spinner fa-spin" style="color:var(--accent-gold);font-size:1.5rem;"></i></td></tr>';
+    try {
+        const params = [];
+        if (year) params.push('academicYear=' + encodeURIComponent(year));
+        if (term) params.push('term=' + encodeURIComponent(term));
+        if (grade) params.push('gradeLevel=' + encodeURIComponent(grade));
+        const res = await fetch('/api/get-all-results' + (params.length ? '?' + params.join('&') : ''));
+        const data = await res.json();
+        if (!data.success) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#c0392b;">Failed to load</td></tr>'; return; }
+        const byStudent = {};
+        data.results.forEach(r => {
+            if (!byStudent[r.student_id]) byStudent[r.student_id] = { name: r.full_name, grade: r.grade_level, cls: r.class_name, total: 0, count: 0 };
+            byStudent[r.student_id].total += Number(r.score || 0);
+            byStudent[r.student_id].count++;
+        });
+        const sorted = Object.entries(byStudent).sort((a,b) => b[1].total - a[1].total).slice(0, limit);
+        if (!sorted.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;">No results found</td></tr>'; return; }
+        const medals = ['🥇','🥈','🥉'];
+        tbody.innerHTML = sorted.map(([id, s], i) => {
+            const avg = (s.total / s.count).toFixed(1);
+            const color = avg >= 75 ? '#2e7d32' : avg >= 50 ? '#f57f17' : '#c0392b';
+            return `<tr><td style="font-weight:800;font-size:1.1rem;">${medals[i] || (i+1)}</td><td style="font-weight:700;color:#1565c0;">${id}</td><td>${s.name}</td><td>Grade ${s.grade||'-'}</td><td>${s.cls||'-'}</td><td style="font-weight:700;">${s.total}</td><td style="font-weight:700;color:${color};">${avg}%</td></tr>`;
+        }).join('');
+    } catch(err) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#c0392b;">Connection error</td></tr>'; }
+}
+
+function exportStudentsCSV() {
+    if (!allStudentsData.length) { alert('Please load students first from the All Students tab'); return; }
+    const headers = ['Student ID', 'Full Name', 'Grade Level', 'Class', 'Date of Birth', 'Gender', 'Student Phone', 'Guardian Name', 'Guardian Phone', 'Address'];
+    const rows = allStudentsData.map(s => [s.student_id, s.full_name, s.grade_level, s.class_name||'', s.date_of_birth||'', s.gender||'', s.student_phone||'', s.guardian_name||'', s.guardian_phone||'', s.address||'']);
+    downloadCSV('students.csv', headers, rows);
+}
+
+function exportResultsCSV() {
+    if (!allResultsData.length) { alert('Please load results first from the All Results tab'); return; }
+    const headers = ['Student ID', 'Full Name', 'Grade', 'Class', 'Subject', 'Score', 'Grade Letter', 'Term', 'Academic Year'];
+    const rows = allResultsData.map(r => [r.student_id, r.full_name, r.grade_level, r.class_name||'', r.subject, r.score, r.grade, r.term, r.academic_year]);
+    downloadCSV('results.csv', headers, rows);
+}
+
+function downloadCSV(filename, headers, rows) {
+    const csv = [headers, ...rows].map(row => row.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+}
+
+async function previewPromote() {
+    const fromGrade = document.getElementById('promote-from').value;
+    const cls = document.getElementById('promote-class').value;
+    const preview = document.getElementById('promote-preview');
+    const confirmBtn = document.getElementById('confirmPromoteBtn');
+    preview.innerHTML = '<p style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
+    confirmBtn.style.display = 'none';
+    try {
+        const res = await fetch('/api/get-all-students');
+        const data = await res.json();
+        let students = data.success ? data.students.filter(s => String(s.grade_level) === fromGrade) : [];
+        if (cls) students = students.filter(s => s.class_name === cls);
+        if (!students.length) { preview.innerHTML = '<p style="color:#999;text-align:center;">No students found.</p>'; return; }
+        const toGrade = parseInt(fromGrade) + 1;
+        preview.innerHTML = `<div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:10px;padding:1rem;margin-top:0.5rem;">
+            <p style="color:#2e7d32;font-weight:700;margin-bottom:0.5rem;"><i class="fas fa-info-circle"></i> ${students.length} students will be promoted from Grade ${fromGrade} to Grade ${toGrade}</p>
+            <div style="max-height:200px;overflow-y:auto;">
+                ${students.map(s => `<div style="font-size:0.85rem;padding:0.3rem 0;border-bottom:1px solid #c8e6c9;">${s.student_id} — ${s.full_name} (Class ${s.class_name||'?'})</div>`).join('')}
+            </div>
+        </div>`;
+        confirmBtn.style.display = 'flex';
+        confirmBtn.dataset.fromGrade = fromGrade;
+        confirmBtn.dataset.cls = cls;
+        confirmBtn.dataset.students = JSON.stringify(students.map(s => s.student_id));
+    } catch(err) { preview.innerHTML = '<p style="color:#c0392b;">Connection error</p>'; }
+}
+
+async function confirmPromote() {
+    const btn = document.getElementById('confirmPromoteBtn');
+    const fromGrade = btn.dataset.fromGrade;
+    const toGrade = parseInt(fromGrade) + 1;
+    const studentIds = JSON.parse(btn.dataset.students);
+    const sEl = document.getElementById('promote-success');
+    const eEl = document.getElementById('promote-error');
+    sEl.classList.remove('show'); eEl.classList.remove('show');
+    if (!confirm(`Are you sure you want to promote ${studentIds.length} students to Grade ${toGrade}? This cannot be undone.`)) return;
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Promoting...';
+    let done = 0, failed = 0;
+    for (const studentId of studentIds) {
+        try {
+            const res = await fetch('/api/update-student', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ studentId, gradeLevel: toGrade }) });
+            const data = await res.json();
+            if (data.success) done++; else failed++;
+        } catch { failed++; }
+    }
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-arrow-up"></i> Confirm Promote';
+    btn.style.display = 'none';
+    sEl.textContent = `✅ ${done} students promoted to Grade ${toGrade} successfully!${failed ? ' ⚠ ' + failed + ' failed.' : ''}`;
+    sEl.classList.add('show');
+    document.getElementById('promote-preview').innerHTML = '';
+}
 async function saveMarks() {
     const studentId=document.getElementById('marks-studentId').value, subject=document.getElementById('marks-subject').value,
           score=parseInt(document.getElementById('marks-score').value), grade=document.getElementById('marks-grade').value,
