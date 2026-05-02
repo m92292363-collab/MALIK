@@ -60,18 +60,22 @@
             flex-wrap: nowrap;
         }
         .nav-left { display: flex; align-items: center; flex-shrink: 0; }
+
+        /* ===== CHANGE 1: SMALLER LANGUAGE TOGGLE (matching Tallinding style) ===== */
         .lang-switch {
-            display: flex; align-items: center; gap: 0.2rem;
-            background: var(--bg-blue-soft); padding: 0.15rem;
-            border-radius: 30px;
+            display: flex; align-items: center; gap: 0.15rem;
+            background: var(--bg-blue-soft); padding: 0.1rem;
+            border-radius: 20px;
         }
         .lang-switch button {
             background: transparent; border: none;
-            padding: 0.3rem 0.85rem; border-radius: 30px;
-            font-size: 0.82rem; font-weight: 700;
+            padding: 0.18rem 0.55rem; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 700;
             cursor: pointer; color: var(--text-dark); transition: all 0.2s;
             font-family: 'Nunito', sans-serif; white-space: nowrap;
         }
+        /* ===== END CHANGE 1 ===== */
+
         .lang-switch button.active { background: var(--islamic-blue) !important; color: white !important; }
         .nav-center { display: flex; align-items: center; gap: 0.75rem; flex: 1; justify-content: center; min-width: 0; }
         .school-logo {
@@ -1191,9 +1195,18 @@
             </div>
         </div>
         <div class="nav-center">
-            <div class="school-logo">
-                <i class="fas fa-mosque"></i>
+            <!-- ===== CHANGE 2: LOGO CONTAINER READY FOR REAL IMAGE ===== -->
+            <!-- To use your real logo: place your logo image file in the same folder
+                 and rename it to "school-logo.png" — it will load automatically.
+                 The mosque icon shows as fallback if the image is not found. -->
+            <div class="school-logo" id="schoolLogoContainer">
+                <img id="schoolLogoImg" src="school-logo.png" alt="Imam Malick Logo"
+                     style="width:100%;height:100%;object-fit:contain;border-radius:50%;display:none;"
+                     onload="this.style.display='block';document.getElementById('schoolLogoFallback').style.display='none';"
+                     onerror="this.style.display='none';document.getElementById('schoolLogoFallback').style.display='';">
+                <i class="fas fa-mosque" id="schoolLogoFallback"></i>
             </div>
+            <!-- ===== END CHANGE 2 ===== -->
             <div class="institute-name" id="mainTitle">
                 <span>Imam Malick</span>
                 <span class="sub">Islamic Institute</span>
@@ -1229,7 +1242,6 @@
                 <div class="carousel-box">
                     <div class="carousel-container" id="mainCarousel">
                         <div class="carousel-slides">
-                            <!-- CHANGE 1: Real img tags (10 slides) -->
                             <div class="carousel-slide active">
                                 <div class="image-container">
                                     <img src="teachers-and-students.jpg" alt="Our Staff" style="width:100%;height:100%;object-fit:contain;">
@@ -1283,7 +1295,6 @@
                         </div>
                         <button class="carousel-arrow prev" onclick="changeSlide(-1)"><i class="fas fa-chevron-left"></i></button>
                         <button class="carousel-arrow next" onclick="changeSlide(1)"><i class="fas fa-chevron-right"></i></button>
-                        <!-- CHANGE 2: 10 dots -->
                         <div class="carousel-dots" id="carouselDots">
                             <span class="dot active" onclick="currentSlide(1)"></span>
                             <span class="dot" onclick="currentSlide(2)"></span>
@@ -1728,7 +1739,6 @@ async function studentLogin() {
     const password = document.getElementById('student-pass-input').value.trim();
     const btn = document.getElementById('studentLoginBtn');
     const errorEl = document.getElementById('student-login-error');
-    // Always hide error first
     errorEl.classList.remove('show');
     errorEl.textContent = '';
     if (!studentId || !password) {
@@ -1774,7 +1784,6 @@ document.getElementById('dashStudentName').textContent = sName;
 document.getElementById('dashStudentNameBig').textContent = sName;
 document.getElementById('dashStudentId').textContent = 'Student ID: ' + sId;
 document.getElementById('dashStudentGrade').textContent = 'Grade Level: ' + sGrade + (sClass ? ' · Class ' + sClass : '');
-    // Format DOB
     var rawDob = student.dateOfBirth || student.date_of_birth || '';
     var formattedDob = '---';
     if (rawDob) {
@@ -1791,7 +1800,6 @@ document.getElementById('dashStudentGrade').textContent = 'Grade Level: ' + sGra
     document.getElementById('studentDashboard').classList.add('active');
     document.body.style.overflow = 'hidden';
 
-    // Load results
     document.getElementById('termCardsGrid').innerHTML = '<div style="grid-column:span 2;text-align:center;padding:3rem;color:#888;"><i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--accent-gold);display:block;margin-bottom:1rem;"></i><p>Loading results...</p></div>';
     try {
         const res = await fetch('/api/get-results?studentId=' + (student.studentId || student.student_id));
@@ -1859,12 +1867,10 @@ function renderTermCards() {
         grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:3rem;color:#888;"><i class="fas fa-inbox" style="font-size:3rem;color:var(--accent-gold);display:block;margin-bottom:1rem;"></i><p>No results available yet.</p></div>';
         return;
     }
-    // Collect unique years
     var years = [];
     allStudentResults.forEach(function(r) {
         if (r.academic_year && !years.includes(r.academic_year)) years.push(r.academic_year);
     });
-    // FIX: All 3 terms included
     var termList = ['Term 1', 'Term 2', 'Term 3'];
     var html = '';
     years.forEach(function(year) {
@@ -1968,7 +1974,6 @@ function showTermReport(term, year) {
 }
 
 function scaleA4ToCanvas() {
-    // FIX: use requestAnimationFrame to ensure layout is complete
     requestAnimationFrame(function() {
         var canvas = document.getElementById('reportCanvas');
         var sheet = document.getElementById('a4Report');
@@ -1981,7 +1986,6 @@ function scaleA4ToCanvas() {
             if (sheetW <= 0) return;
             var scale = Math.min(1, canvasW / sheetW);
             sheet.style.transform = 'scale(' + scale + ')';
-            // FIX: correct margin calculation to avoid layout collapse
             var scaledHeight = sheet.offsetHeight * scale;
             var naturalHeight = sheet.offsetHeight;
             sheet.style.marginBottom = '-' + Math.max(0, naturalHeight - scaledHeight - 24) + 'px';
